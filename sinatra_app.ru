@@ -32,6 +32,13 @@ class MyApplication < Sinatra::Base
     HTML
   end
 
+  get '/auth/failure' do
+    <<~HTML
+      <div>You reached this due to an error in OmniAuth</div>
+      <div>Strategy: #{params['strategy']}</div>
+      <div>Message: #{params['message']}</div>
+    HTML
+  end
 end
 
 run MyApplication

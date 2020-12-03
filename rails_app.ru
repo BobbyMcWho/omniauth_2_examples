@@ -19,7 +19,7 @@ class TokenVerifier
 
   def call(env)
     @request = ActionDispatch::Request.new(env.dup)
-    raise ActionController::InvalidAuthenticityToken unless verified_request?
+    raise OmniAuth::AuthenticityError unless verified_request?
   end
 
   private
@@ -56,11 +56,21 @@ class PagesController < ActionController::Base
       <div>Welcome #{request.env['omniauth.auth']['uid']}</div>
     HTML
   end
+
+  def failure
+    render inline: \
+    <<~HTML
+      <div>You reached this due to an error in OmniAuth</div>
+      <div>Strategy: #{params['strategy']}</div>
+      <div>Message: #{params['message']}</div>
+    HTML
+  end
 end
 
 MyApplication.routes.draw do
   root to: 'pages#index'
   post '/auth/developer/callback', to: 'pages#callback'
+  get '/auth/failure', to: 'pages#failure'
 end
 
 run MyApplication
