@@ -2,36 +2,21 @@ require 'bundler/inline'
 
 gemfile(true) do
   source 'https://rubygems.org'
-  gem 'omniauth', github: 'omniauth/omniauth', branch: '2_0-indev'
   gem 'rails'
+  gem 'omniauth', github: 'omniauth/omniauth', branch: '2_0-indev'
+  gem 'omniauth-rails_csrf_protection', github: 'bobbymcwho/omniauth-rails_csrf_protection', branch: '2_0_0-rc1_support'
   gem 'pry'
 end
 
 require 'rails'
 require 'action_controller/railtie'
+require 'omniauth'
 require 'pry'
-
-# Derived from https://github.com/cookpad/omniauth-rails_csrf_protection/blob/master/lib/omniauth/rails_csrf_protection/token_verifier.rb
-# This specific implementation has been pared down and should not be taken as the most correct way to do this.
-class TokenVerifier
-  include ActiveSupport::Configurable
-  include ActionController::RequestForgeryProtection
-
-  def call(env)
-    @request = ActionDispatch::Request.new(env.dup)
-    raise OmniAuth::AuthenticityError unless verified_request?
-  end
-
-  private
-  attr_reader :request
-  delegate :params, :session, to: :request
-end
 
 class MyApplication < Rails::Application
   config.session_store :cookie_store, key: '_session'
   config.secret_key_base = '7893aeb3427daf48502ba09ff695da9ceb3c27daf48b0bba09df'
   config.middleware.use OmniAuth::Strategies::Developer
-  OmniAuth.config.request_validation_phase = ::TokenVerifier.new
 
   Rails.logger = Logger.new($stdout)
 end
@@ -66,6 +51,8 @@ class PagesController < ActionController::Base
     HTML
   end
 end
+
+MyApplication.initialize!
 
 MyApplication.routes.draw do
   root to: 'pages#index'

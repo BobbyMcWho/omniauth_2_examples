@@ -2,7 +2,7 @@ require 'bundler/inline'
 
 gemfile(true) do
   source 'https://rubygems.org'
-  gem 'omniauth', github: 'BobbyMcWho/omniauth', branch: 'make-omniauth-use-post-by-default'
+  gem 'omniauth', github: 'omniauth/omniauth', branch: '2_0-indev'
   gem 'sinatra'
 end
 
